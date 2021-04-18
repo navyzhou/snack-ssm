@@ -105,8 +105,7 @@
 CKEDITOR.replace('goods_form_descr');
 
 var goods_obj = $('#goods_data').datagrid({   
-    url: '../../goods',
-    queryParams: {op:"findByPage"},
+    url: '../../goods/findByPage',
     fitColumns: true,
     striped: true,
     loadMsg: "数据加载中，请稍后...",
@@ -141,13 +140,13 @@ var goods_obj = $('#goods_data').datagrid({
 }); 
 
 $(function(){
-	$.post("../../type", {op:"finds"}, result => {
+	$.post("../../type/finds", null, result => {
 		var str = "";
-		$.each(result, function(index, item) {
+		$.each(result.data, function(index, item) {
 			str += "<option value='" + item.tno + "'>" + item.tname + "</option>";
 		})
-		$("#goods_search_tno").append($(str));
-		$("#goods_form_tno").append($(str));
+		$("#goods_search_tno").html("").append($(str));
+		$("#goods_form_tno").html("").append($(str));
 	}, "json");
 })
 
@@ -158,8 +157,8 @@ function searchGoodsInfo() {
 	var end = $.trim($("#goods_search_end").val());
 	
 	goods_obj.datagrid({
-		url: "../../goods",
-		queryParams: {op:"findByPage", tno:tno, gname:gname, start:start, end:end}
+		url: "../../goods/findByPage",
+		queryParams: {tno:tno, gname:gname, start:start, end:end}
 	})
 }
 
@@ -210,14 +209,13 @@ function goods_addgoods() {
 	}
 	
 	$.ajaxFileUpload({
-		url: "../../goods?op=add",
+		url: "../../goods/add",
 		secureuri:false,
 		fileElementId: "goods_form_pics",
-		dataType: "text",
+		dataType: "json",
 		data: {tno:tno, gname:gname, price:price, balance:balance, unit:unit, weight:weight, qperied:qperied, intro:intro, descr:descr, status:1},
 		success: function(data, status) {
-			data = parseInt($.trim(data));
-			if (data > 0) {
+			if (data.code == 200) {
 				$('#goods_data').datagrid("reload"); // 重新加载数据 
 				$("#goods_dialog").dialog("close"); // 隐藏弹出框
 				$.messager.show({title:'成功提示',	msg:'商品信息添加成功...', timeout:2000, showType:'slide'});

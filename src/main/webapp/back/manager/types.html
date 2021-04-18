@@ -6,11 +6,10 @@ var types_op;
 var types_msg;
 
 var types_obj = $('#types_data').datagrid({   
-    url: '../../type',
+    url: '../../type/findAll',
     fitColumns: true,
     striped: true,
     loadMsg: "数据加载中，请稍后...",
-    queryParams: {op:"findAll"},
     sortName: "tno",
     remoteSort: false,
     rownumbers: true,
@@ -75,14 +74,10 @@ var types_obj = $('#types_data').datagrid({
 			
 			// 获取编辑的数据
 			var row = types_obj.datagrid('getChanges')[0];
-			 
-			row.op = types_op; // 往这个row对象中添加一个属性
 			
 			// 发送到数据库
-			$.post("../../type", row,  result => {
-				result = parseInt($.trim(result));
-				
-				if (result > 0) {
+			$.post("../../type/" + types_op, row,  result => {
+				if (result.code == 200) {
 					$.messager.show({title:'成功提示',	msg:'商品类型' + types_msg + '成功...', timeout:2000, showType:'slide'});
 					types_obj.datagrid('reload'); // 重新加载数据
 				} else {
@@ -91,7 +86,7 @@ var types_obj = $('#types_data').datagrid({
 				}
 				row = null;
 				types_edit_index = undefined;
-			}, "text");
+			}, "json");
 		}
 	},'-',{
 		iconCls: 'icon-undo',

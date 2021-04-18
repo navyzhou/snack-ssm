@@ -28,12 +28,8 @@ public class GoodsTypeController {
 	}
 
 	@RequestMapping("/findAll")
-	public ResultVO findAll() {
-		List<GoodsType> list = typeService.findAll();
-		if (list == null || list.isEmpty()) {
-			return new ResultVO(300, "暂无数据");
-		}
-		return new ResultVO(200, "成功", list);
+	public List<GoodsType> findAll() {
+		 return typeService.findAll();
 	}
 
 	@RequestMapping("/update")

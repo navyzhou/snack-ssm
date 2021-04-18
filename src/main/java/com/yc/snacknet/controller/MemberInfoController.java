@@ -1,5 +1,9 @@
 package com.yc.snacknet.controller;
 
+import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
+
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.yc.snacknet.bean.MemberInfo;
 import com.yc.snacknet.service.IMemberInfoService;
+import com.yc.snacknet.util.SendEmailUtil;
 import com.yc.snacknet.util.SessionKeys;
 import com.yc.snacknet.vo.ResultVO;
 
@@ -18,6 +23,9 @@ import com.yc.snacknet.vo.ResultVO;
 public class MemberInfoController {
 	@Autowired
 	private IMemberInfoService memberInfoService;
+	
+	@Autowired
+	private SendEmailUtil sendEmailUtil;
 
 	@PostMapping("/login")
 	public ResultVO login(MemberInfo mf, HttpSession session) {
@@ -50,5 +58,31 @@ public class MemberInfoController {
 			return new ResultVO(500, "未登录");
 		}
 		return new ResultVO(200, "成功", obj);
+	}
+	
+	@PostMapping("/send")
+	public ResultVO send(String name, String receive, HttpSession session) {
+		String code = "";
+		Random rd = new Random();
+		while (code.length() < 6) {
+			code += rd.nextInt(10);
+		}
+		
+		if (sendEmailUtil.sendEmail(receive, code, name)) {
+			session.setAttribute(SessionKeys.VERCODE, code);
+			
+			TimerTask task = new TimerTask() {
+				@Override
+				public void run() {
+					session.removeAttribute(SessionKeys.VERCODE);
+				}
+			};
+			
+			Timer timer = new Timer();
+			
+			timer.schedule(task, 180000);
+			return new ResultVO(200, "成功");
+		}
+		return new ResultVO(500, "失败");
 	}
 }

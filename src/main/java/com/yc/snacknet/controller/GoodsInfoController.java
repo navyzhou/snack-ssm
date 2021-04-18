@@ -74,7 +74,7 @@ public class GoodsInfoController {
 				
 				// 以下必须这样写
 				result.put("fileName", upload.getOriginalFilename());
-				result.put("url", "../../" + savePath);
+				result.put("url", "../../../" + savePath);
 				result.put("uploaded", 1);
 			} catch (IllegalStateException e) {
 				e.printStackTrace();
@@ -95,12 +95,8 @@ public class GoodsInfoController {
 	}
 
 	@RequestMapping("/findByPage")
-	public ResultVO findByPage(@RequestParam Map<String, Object> map) {
-		Map<String, Object> result = goodsInfoService.findByPage(map);
-		if (result == null || result.isEmpty()) {
-			return new ResultVO(300, "暂无数据");
-		}
-		return new ResultVO(200, "成功", result);
+	public Map<String, Object> findByPage(@RequestParam Map<String, Object> map) {
+		return goodsInfoService.findByPage(map);
 	}
 	
 	/**

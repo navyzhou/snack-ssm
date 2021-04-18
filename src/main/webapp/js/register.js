@@ -159,6 +159,23 @@ function sendCode(){
 	
 	//请求方式  地址  参数  回调函数
 	// TODO: 发送请求
+	$.post("member/send", {receive: email, name: nickName}, result => {
+		if (result.code == 200) {
+			var time = 180;
+			var timeTask = setInterval(() => {
+				if (time > 0) {
+					time --;
+					$("#getCode").val(time + "s");
+				} else {
+					$("#getCode").removeAttr("disabled").val("重新获取");
+					clearInterval(timeTask);
+				}
+			}, 1000);
+		} else {
+			$("#getCode").removeAttr("disabled").val("重新获取");
+			alert("邮件发送失败...");
+		}
+	}, "json");
 }
 	
 

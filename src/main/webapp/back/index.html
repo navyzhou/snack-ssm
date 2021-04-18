@@ -46,7 +46,7 @@ function checkLogin() {
 	}
 	
 	$.post("../admin/login", {aname: account, pwd: pwd}, result => {
-		if (result.code == 200 && result.data.code == 200) {
+		if (result.code == 200) {
 			location.href="manager/index.html";	
 		} else {
 			alert("账号或密码错误...");

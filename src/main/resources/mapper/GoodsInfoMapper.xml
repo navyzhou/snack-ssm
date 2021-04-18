@@ -49,7 +49,7 @@
 			</if>
 			
 			<if test="tno != null and tno !=''">
-				and g.tno = #{tno}
+				and tno = #{tno}
 			</if>
 			
 			<if test="start != null and start !=''">
