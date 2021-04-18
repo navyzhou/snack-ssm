@@ -1,4 +1,3 @@
-// JavaScript Document
 //失去焦点事件
 $("#nickname").blur (function(){
 	//获取用户输入的用户名
