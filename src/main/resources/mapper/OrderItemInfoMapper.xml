@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 注意：namespace必须是这个映射文件对应的接口的类路径 -->
+<mapper namespace="com.yc.snacknet.mapper.IOrderItemInfoMapper">
+	<insert id="add" parameterType="map">
+		insert into orderiteminfo select 0, #{ono}, cf.gno, num, price, 1 from cartinfo cf, goodsinfo gf where cf.gno=gf.gno
+		<foreach collection="cnos" open="and cno in("  close=")" separator="," item="item">
+			#{item}
+		</foreach>
+	</insert>
+</mapper>

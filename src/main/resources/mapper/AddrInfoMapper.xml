@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 注意：namespace必须是这个映射文件对应的接口的类路径 -->
+<mapper namespace="com.yc.snacknet.mapper.IAddrInfoMapper">
+	<select id="findByMno" parameterType="int" resultType="AddrInfo">
+		select ano, mno, name, tel, province, city, area, addr, flag from addrinfo where status!=0 and mno=#{_parameter}
+	</select>
+	
+	<insert id="add" parameterType="AddrInfo">
+		insert into addrinfo values(#{ano}, #{mno}, #{name}, #{tel}, #{province}, #{city}, #{area}, #{addr}, #{flag}, 1)
+	</insert>
+</mapper>

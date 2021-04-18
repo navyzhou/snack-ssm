@@ -1,0 +1,271 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>源辰-零食网</title>
+<meta name="keywords" content="小吃,美食,零食,源辰" />
+<meta name="description" content="各种小吃美食，应有尽有" />
+<link href="images/yc.png" rel="shortcut icon" type="image/x-icon" />
+<link href="css/header.css" rel="stylesheet" type="text/css" />
+<link href="css/index.css" rel="stylesheet" type="text/css" />
+<link href="css/footer.css" rel="stylesheet" type="text/css" />
+<style type="text/css">
+#pagination {
+	margin-top: 20px;
+	text-align: center;
+}
+
+.pagination a{
+	padding: 4px 8px;
+	margin: 4px;
+	border: 1px solid #aaaadd; 
+	text-decoration: none;
+	color: #006699;
+	display:inline-block;
+}
+
+.pagination a:hover {
+	border-color: #FF0000;
+	color: #000;
+}
+
+.pagination .current {
+	font-weight: bold;
+	background-color: #E54915;
+	color: #FFF;
+}
+
+.pagination .show {
+	display: none;
+}
+</style>
+</head>
+
+<body>
+<!-- 顶部区域 -->
+<header id="header">
+	<!-- 顶部标题区域 -->
+	<div class="htitle">
+    	<a href="#" target="_blank" class="location">衡阳</a>
+        
+        <div class="header-info" id="login_info">
+            <div class="login-info" v-if="onlogin">
+            	<a href="user.html" title="点击登录" target="_blank">欢迎您：{{nickName}}</a>
+                <a href="register.html" title="点击注册"> 免费注册 </a>
+            </div>
+            
+            <div class="login-info" v-else>
+            	<a href="login.html" title="点击登录">您好，请登录</a>
+                <a href="register.html" title="点击注册"> 免费注册 </a>
+            </div>
+            
+            <div class="person-info">
+            	<span>|</span>
+            	<a href="front/order.html" target="_blank">我的订单</a>
+                <span>|</span>
+                <a href="#" target="_blank">我的小吃</a>
+                <span>|</span>
+                <a href="#" target="_blank">客户服务</a>
+                <span>|</span>
+           		<a href="#" target="_blank">个人信息</a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 顶部搜索区域 -->
+    <div class="search">
+    	<div class="search_left">
+    		<a href="index.html" title="首页">
+            	<img src="images/logo.png" width="260px" height="120px"/> 
+            </a>
+        </div>
+        
+        <div class="search_right" id="search_item">
+        	<div class="search_top">
+                <div class="search_div">
+                    <input type="search" class="search-ipt" id="search_gname" placeholder="请输入要搜索的内容" />
+                    <input type="button" class="search-btn" onclick="search()"/>  
+                </div>
+                <div class="buycart">
+                	<i class="iconfont">{{cartCount}}</i>
+                    <a href="front/cart.html" target="_blank">我的购物车</a>
+                </div>
+            </div>
+            
+            <div class="search_item">
+            	<a href="javascript:void(0)" data-tno="" class="selected" @click="findByTno(0, '')">全部</a>
+            	<a v-for="(type, index) in types" :data-tno="type.tno"  href="javascript:void(0)" @click="findByTno(index + 1, type.tno)">{{type.tname}}</a>
+            </div>
+        </div>
+    </div>
+</header>
+
+<div class="slide">
+	<ul class="slide_pics">
+        <li><a href="" class=""><img src="images/slide01.jpg" alt="幻灯片"></a></li>
+        <li><a href="" class=""><img src="images/slide02.jpg" alt="幻灯片"></a></li>
+        <li><a href="" class=""><img src="images/slide03.jpg" alt="幻灯片"></a></li>
+        <li><a href="" class=""><img src="images/slide04.jpg" alt="幻灯片"></a></li>
+        <li><a href="" class=""><img src="images/slide05.jpg" alt="幻灯片"></a></li>
+    </ul>
+    <div class="prev"></div>
+    <div class="next"></div>
+    <ul class="points"></ul>
+</div>
+
+
+<article id="app">
+    <div class="view_title">
+    	<a href="" class="view_price price_down">价格</a>
+        <input type="number" id="start_price" class="price_ipt" min="1"/>
+        <span>-</span>
+        <input type="number" id="end_price" class="price_ipt" min="1"/>
+    </div>
+    
+    <div class="view_goods">
+    	<ul id="view_goods">
+        	<li class="hot_box" v-for="good in goods">
+            	<i class="all_i i_t"></i>
+				<i class="all_i i_r"></i>
+				<i class="all_i i_b"></i>
+				<i class="all_i i_l"></i>
+                <a :href="'detail.html?' + good.gno" target="_blank" class="hot_warp">
+                	<img :src="good.pic" :title="good.gname"/>
+                    <span>{{good.gname}}</span>
+                </a>
+                <div class="view_info">
+                	<span class="price">{{good.price}}</span>
+                    <span>/ {{good.weight}}</span>
+                    <span class="buy" @click="addCart(good.gno)">&nbsp;</span>
+                </div>
+            </li>
+        </ul>
+    </div>
+    
+    <div class="pagination" id="pagination">
+    	
+    </div>
+</article>
+<div class="popup_con">
+	<div class="popup">
+		<p id="popup_info"></p>
+	</div>
+</div>  
+<footer>
+	<div class="foot_link">
+        <a href="#">关于我们</a> <span> | </span>
+        <a href="#">联系我们</a> <span> | </span>
+        <a href="#">招聘广告</a> <span> | </span>
+        <a href="#">友情链接</a>
+    </div>
+    <p>CopyRight &copy; 2019 <a class="copy" href="http://www.hyycinfo.com" target="_blank">衡阳市源辰信息科技有限公司</a> All Rights Reserverd</p>
+    <p>电话：0734-8355998 湘ICP备16015987号-1</p>
+</footer>
+<script src="js/jquery-3.4.1.min.js" type="text/javascript"></script>
+<script src="js/jquery-ui.min.js" type="text/javascript"></script>
+<script src="js/slide.js" type="text/javascript"></script>
+<script src="js/index.js" type="text/javascript"></script>
+
+<script type="text/javascript" src="js/vue.js"></script>
+<script type="text/javascript" src="js/axios.js"></script>
+<script type="text/javascript" src="js/qs.js"></script>
+<script type="text/javascript" src="js/checklogin.js"></script>
+<script type="text/javascript" src="js/showpage.js"></script>
+<script type="text/javascript">
+var page = 1;
+var rows = 5;
+	
+let types = new Vue({
+	el: "#search_item",
+	data: {
+		types: [],
+		cartCount: 0,
+		carts: []
+	},
+	mounted: function() { // 页面渲染完成后要执行的方法
+		axios.post("type/finds").then(result => { // vue的axios里面默认发送请求时的参数格式为json格式，这样的后后台没法识别，需要通过qs.stringify()方法转成op=finds
+			if (result.status == 200 && result.data.code == 200) { // 说明请求成功
+				this.types  = result.data.data;
+			}
+		}) 
+		
+		axios.get("cart/info").then(result => {
+			if (result.status == 200 && result.data.code == 200) { 
+				this.cartCount = result.data.data.length;
+				this.carts = result.data.data;
+			}
+		})
+	},
+	methods:  {
+		findByTno: function(idx, tno) {
+			if ($("#search_item>a").eq(idx).hasClass("selected")) {
+				return;
+			}
+			$("#search_item>a").removeClass("selected");
+			$("#search_item>a").eq(idx).addClass("selected");
+			page = 1;
+						
+			axios.post("goods/findByFirst", qs.stringify({page:page, rows:rows, tno:tno})).then(result => { // vue的axios里面默认发送请求时的参数格式为json格式，这样的后后台没法识别，需要通过qs.stringify()方法转成op=finds
+				if (result.status == 200 && result.data.code == 200) { // 说明请求成功
+					vm.$data.goods = result.data.data.rows;
+					$("#pagination").showPage( Math.ceil(result.data.data.total / rows) );
+				}
+			}) 
+		}
+	}
+})
+
+let vm = new Vue({
+	el: "#app",
+	data: {
+		goods: [], // 要显示的这一页的数据
+		totalPage: 1, // 总页数
+	},
+	mounted: function() { // 页面渲染完成后要执行的方法
+		axios.post("goods/findByFirst", qs.stringify({page:page, rows:rows})).then(result => { // vue的axios里面默认发送请求时的参数格式为json格式，这样的后后台没法识别，需要通过qs.stringify()方法转成op=finds
+			if (result.status == 200 && result.data.code == 200) { // 说明请求成功
+				this.goods  = result.data.data.rows;
+				this.totalPage = Math.ceil(result.data.data.total / rows);
+				$("#pagination").showPage(this.totalPage);
+			}
+		}) 
+	},
+	methods: {
+		addCart: function(gno) {
+			
+		}
+	}
+})
+
+function search() {
+	page = 1;
+	var gname = $.trim($("#search_gname").val());
+	var tno = $.trim($("#search_item>a[class='selected']").data("tno")); // 取data-tno属性的值
+	var sprice = $.trim($("#start_price").val());
+	var eprice = $.trim($("#end_price").val());
+	
+	axios.post("goods/findByFirst",qs.stringify({gname:gname, tno:tno, sprice:sprice, eprice:eprice, page:page, rows:rows})).then(rt => {
+		if (rt.status == 200 && rt.data.code == 200) { // 说明请求成功
+			vm.$data.goods  = rt.data.data.rows;
+			vm.$data.totalPage = Math.ceil(rt.data.data.total / rows);
+			$("#pagination").showPage(vm.$data.totalPage);
+		}
+	})
+}
+
+function findByPage(index, obj) {
+	page = index;
+	var gname = $.trim($("#search_gname").val());
+	var tno = $.trim($("#search_item>a[class='selected']").data("tno")); // 取data-tno属性的值
+	var sprice = $.trim($("#start_price").val());
+	var eprice = $.trim($("#end_price").val());
+	
+	axios.post("goods/finds",qs.stringify({gname:gname, tno:tno, sprice:sprice, eprice:eprice, page:page, rows:rows})).then(rt => {
+		if (rt.status == 200 && rt.data.code == 200) { // 说明请求成功
+			vm.$data.goods = rt.data.data;
+		}
+	})
+}
+</script>
+</body>
+</html>

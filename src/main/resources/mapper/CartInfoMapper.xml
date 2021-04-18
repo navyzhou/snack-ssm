@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 注意：namespace必须是这个映射文件对应的接口的类路径 -->
+<mapper namespace="com.yc.snacknet.mapper.ICartInfoMapper">
+	<select id="finds" parameterType="int" resultType="CartInfo">
+		select cno, c.gno, num, price, pics, gname, unit, weight from goodsinfo g, cartinfo c where c.gno=g.gno and mno=#{_parameter}
+	</select>
+	
+	<select id="info" parameterType="int" resultType="map">
+		select cno, gno from cartinfo where mno=#{_parameter}
+	</select>
+	
+	<update id="update" parameterType="map">
+		update cartinfo set num = num + #{num} where cno = #{cno}
+	</update>
+	
+	<update id="add" parameterType="CartInfo">
+		insert into cartinfo values(#{cno}, #{mno}, #{gno}, #{num})
+	</update>
+	
+	<delete id="delete" parameterType="string">
+		delete from cartinfo where cno=#{_parameter}
+	</delete>
+	
+	<delete id="deletes">
+		delete from cartinfo
+		<where>
+			<foreach collection="array" open=" cno in(" close=")" separator="," item="item">
+				#{item}
+			</foreach>
+		</where>
+	</delete>
+	
+	<select id="findByCno" resultType="CartInfo">
+		select cno, c.gno, num, price, pics, gname, unit, weight from goodsinfo g, cartinfo c where c.gno=g.gno
+		<foreach collection="array" open=" and cno in(" close=")" separator="," item="item">
+			#{item}
+		</foreach>
+	</select>
+</mapper>

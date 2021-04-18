@@ -1,0 +1,270 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>源辰-零食网商品详细</title>
+<meta name="keywords" content="小吃,美食,零食,源辰" />
+<meta name="description" content="各种小吃美食，应有尽有" />
+<link href="images/yc.png" rel="shortcut icon" type="image/x-icon" />
+<link href="css/header.css" rel="stylesheet" type="text/css" />
+<link href="css/index.css" rel="stylesheet" type="text/css" />
+<link href="css/footer.css" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" href="css/detail.css" type="text/css" >
+</head>
+
+<body>
+<!-- 顶部区域 -->
+<header id="header">
+	<!-- 顶部标题区域 -->
+	<div class="htitle">
+    	<a href="#" target="_blank" class="location">衡阳</a>
+        
+        <div class="header-info" id="login_info">
+            <div class="login-info" v-if="onlogin">
+            	<a href="user.html" title="点击登录" target="_blank">欢迎您：{{nickName}}</a>
+                <a href="register.html" title="点击注册"> 免费注册 </a>
+            </div>
+            
+            <div class="login-info" v-else>
+            	<a href="login.html" title="点击登录">您好，请登录</a>
+                <a href="register.html" title="点击注册"> 免费注册 </a>
+            </div>
+            
+            <div class="person-info">
+            	<span>|</span>
+            	<a href="front/order.html" target="_blank">我的订单</a>
+                <span>|</span>
+                <a href="#" target="_blank">我的小吃</a>
+                <span>|</span>
+                <a href="#" target="_blank">客户服务</a>
+                <span>|</span>
+           		<a href="#" target="_blank">个人信息</a>
+            </div>
+        
+        </div>
+    </div>
+    
+    <!-- 顶部搜索区域 -->
+    <div class="search">
+    	<div class="search_left">
+    		<a href="index.html" title="首页">
+            	<img src="images/logo.png" width="260px" height="120px"/> 
+            </a>
+        </div>
+        
+        <div class="search_right"  id="search_item">
+        	<div class="search_top">
+                <div class="search_div">
+                    <input type="search" class="search-ipt" placeholder="请输入要搜索的内容" />
+                    <input type="button" class="search-btn"/>  
+                </div>
+                <div class="buycart">
+                	<i class="iconfont">{{cartCount}}</i>
+                    <a href="front/cart.html" target="_blank">我的购物车</a>
+                </div>
+            </div>
+            
+            <div class="search_item">
+            	<a href="javascript:void(0)" data-tno="" class="selected" @click="findByTno(0, '')">全部</a>
+            	<a v-for="(type, index) in types" :data-tno="type.tno"  href="javascript:void(0)" @click="findByTno(index + 1, type.tno)">{{type.tname}}</a>
+            </div>
+        </div>
+    </div>
+</header>
+<div id="app">       
+	<!-- 面包屑导航 --> 
+	<div class="breadcrumb" id="breadcrumb">
+	    <a href="javascript:void(0)">全部分类</a>
+	    <span>&gt;</span>
+	    <a href="javascript:void(0)" id="goods_type">{{goods.gname}}</a>
+	    <span>&gt;</span>
+	    <a href="javascript:void(0)">商品详情</a>
+	 </div>
+  
+	<!-- 商品展示 -->
+	<div class="goods_details_con clearfix">
+	    <div class="goods_details_pic fl" id="goods_pics">
+	        <img v-for="pic in pics" :src="pic">
+	    </div>
+	    <div class="goods_details_list fr">
+	        <h3>{{goods.gname}}</h3>
+	        <p>{{goods.intro}}</p>
+	        <div class="price_bar">
+	            <span class="show_price">&yen;<em>{{goods.price}}</em>元</span>
+	            <span class="show_unit">单位：<em>{{goods.weight}} / {{goods.unit}}</em></span>
+	        </div>
+	        <div class="goods_num clearfix">
+	            <div class="num_name fl">数量：</div>
+	            <div class="num_add fl">
+	                <input type="text" class="num_show fl" v-model="nums" id="goods_count">
+	                <a href="javascript:void(0)" class="add fr" @click="addNum(1)">+</a>
+	                <a href="javascript:void(0)" class="minus fr" @click="addNum(-1)">-</a>	
+	            </div>
+	            <div class="balance_cls">仓库量<span id="store_num">{{goods.balance}}</span> {{goods.unit}}</div>
+	        </div>
+	        <div class="total">总价：<em v-html="(goods.price * nums).toFixed(2)"></em>元</div>
+	        <div class="operate_btn">
+	            <a href="javascript:;" class="buy_btn" id="buy_btn">立即购买</a>
+	            <a href="javascript:void(0);" class="add_cart" id="add_cart" @click="addCart()">加入购物车</a>				
+	        </div>
+	    </div>
+	</div>
+	
+	<!-- 商品详情 -->
+	<div class="main_wrap clearfix">
+	    <div class="l_wrap fl clearfix">
+	        <div class="new_goods">
+	            <h3>新品推荐</h3>
+	            <ul>
+	                <li>
+	                    <a href="#"><img src="images/goods/good01.jpg"></a>
+	                    <h4><a href="#">零食大礼包</a></h4>
+	                    <div class="prize">&yen;3.90</div>
+	                </li>
+	                <li>
+	                    <a href="#"><img src="images/goods/good02.jpg"></a>
+	                    <h4><a href="#">多味泡泡糖</a></h4>
+	                    <div class="prize">&yen;16.80</div>
+	                </li>
+	            </ul>
+	        </div>
+	    </div>
+	
+	    <div class="r_wrap fr clearfix">
+	        <ul class="detail_tab clearfix">
+	            <li class="active">商品介绍</li>
+	            <li>评论</li>
+	            <li>推荐</li>
+	        </ul>
+	
+	        <div class="tab_content">
+	            <dl>
+	                <dt>商品详情：</dt>
+	                <dd v-html="goods.descr"></dd>
+	            </dl>
+	        </div>
+	
+	    </div>
+	</div>
+</div>
+<div class="popup_con">
+	<div class="popup">
+		<p id="popup_info"></p>
+	</div>
+</div>    
+<!-- 版权所有 -->
+<footer>
+	<div class="foot_link">
+        <a href="#">关于我们</a> <span> | </span>
+        <a href="#">联系我们</a> <span> | </span>
+        <a href="#">招聘广告</a> <span> | </span>
+        <a href="#">友情链接</a>
+    </div>
+    <p>CopyRight &copy; 2019 <a class="copy" href="http://www.hyycinfo.com" target="_blank">衡阳市源辰信息科技有限公司</a> All Rights Reserverd</p>
+    <p>电话：0734-8355998 湘ICP备16015987号-1</p>
+</footer>
+<script type="text/javascript" src="js/jquery-3.4.1.min.js"></script>
+<script type="text/javascript" src="js/vue.js"></script>
+<script type="text/javascript" src="js/axios.js"></script>
+<script type="text/javascript" src="js/qs.js"></script>
+<script type="text/javascript" src="js/checklogin.js"></script>
+<script type="text/javascript" src="js/getcartinfo.js"></script>
+<script>
+let app = new Vue({
+	el: "#app",
+	data: {
+		goods: {},
+		nums: 1,
+		pics: []
+	},
+	mounted: function() {
+		axios.all([findGoodsByGno()]).then(axios.spread((result) => {
+			if (result.status == 200 && result.data.code == 200) {
+				this.goods = result.data.data;
+				this.pics = result.data.data.pics.split(",");
+				
+				this.$nextTick(function(){ // 第一次渲染完成后要执行的代码
+					showPics();
+				})
+			}
+		}))
+	},
+	methods: {
+		addNum: function(num) {
+			if (num == -1 && this.nums == 1) { // 说明不能减了
+				return;
+			}
+			
+			if (num == 1 && this.goods.balance <= this.nums) { // 说明不能加了
+				return;
+			}
+			
+			this.nums = parseInt(this.nums) + num;
+		},
+		addCart: function() {
+			// 先判断用户是否已经登录
+			if (!login.$data.loginId) { // 如果为空，则说明没有登录
+				showMsg("请先登录...", function() {location.href="login.html"});
+				return;
+			}
+			
+			// 判断这个商品是否已经在购物车
+			if (types.$data.cartCount > 0) { // 说明当前用户的购物车中有数据
+				let lcarts = types.$data.carts; // 获取当前用户的购物车信息
+				for (let i = 0, len = lcarts.length; i < len; i ++) {
+					if (lcarts[i].gno == this.goods.gno) { // 说明这个商品在购物车里面已经存在
+						axios.post("cart/update", qs.stringify({num:this.nums, cno:lcarts[i].cno})).then(result => {
+							if (result.status == 200 && result.data.code == 200) {
+								showMsg("加入购物车成功...", function() {});
+							} else {
+								showMsg("加入购物车失败...", function() {});
+							}
+						})
+						return;
+					}
+				}
+			}
+			
+			// 要么这个商品没有在购物车里面，要么就是购物车里面还没有东西
+			axios.post("cart/add", qs.stringify({gno:this.goods.gno, num:this.nums, mno:login.$data.loginId})).then(result => {
+				if (result.status == 200 && result.data.code == 200) {
+					types.$data.cartCount = types.$data.cartCount + 1; // 购物车中商品的数量 + 1
+					let newObj = {};
+					newObj.cno = result.data.data;
+					newObj.gno = this.goods.gno;
+					types.$data.carts.push(newObj);
+					showMsg("加入购物车成功...", function() {});
+				} else {
+					showMsg("加入购物车失败...", function() {});
+				}
+			})
+			
+		}
+	}
+})
+
+function findGoodsByGno() {
+	var gno = location.search;
+	if (gno == "") { // 说明没有带商品编号信息，则不满足要求，那么我们就跳到首页
+		location.href="index.html";
+		return;
+	}
+	gno = gno.replace("?", "");
+
+	return axios.post("goods/findByGno", qs.stringify({gno:gno}));
+}
+
+function showPics() {
+	var imglen = $("#goods_pics>img").length;
+	if (imglen > 1) { // 说明有多张，则需要轮播
+		var i = 0;
+		setInterval(() => {
+			$("#goods_pics>img").css("display", "none");
+			$("#goods_pics>img").eq(i).css("display", "block");
+			i = (i + 1) % imglen;
+		}, 2000);
+	}
+}
+</script>
+</body>
+</html>

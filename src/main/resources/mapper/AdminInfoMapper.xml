@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 注意：namespace必须是这个映射文件对应的接口的类路径 -->
+<mapper namespace="com.yc.snacknet.mapper.IAdminInfoMapper">
+	<!-- 这里面的id必须是这个接口里面的方法的方法名 
+		parameterType必须跟这个方法的形参类型一直
+		resultType必须跟这个方法的返回值类型一直
+	-->
+	<select id="login" parameterType="AdminInfo" resultType="AdminInfo">
+		select aid, aname, tel from admininfo where (aname=#{aname} or tel=#{aname}) and pwd=md5(#{pwd})
+	</select>
+</mapper>

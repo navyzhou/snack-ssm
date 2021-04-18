@@ -1,0 +1,105 @@
+<table id="types_data" data-options="fit:true"></table>  
+<script type="text/javascript">
+var types_status_obj = [{id: 0, name:"已下架"}, {id:1, name:"正常"}];
+var types_edit_index = undefined;
+var types_op;
+var types_msg;
+
+var types_obj = $('#types_data').datagrid({   
+    url: '../../type',
+    fitColumns: true,
+    striped: true,
+    loadMsg: "数据加载中，请稍后...",
+    queryParams: {op:"findAll"},
+    sortName: "tno",
+    remoteSort: false,
+    rownumbers: true,
+    columns:[[   
+        {field:'tno',title:'类型编号',width:100, align:'center', sortable: "true"},   
+        {field:'tname',title:'商品类型',width:100, align:'center', editor:{type:"text", options:{required: true}}},   
+        {field:'status',title:'商品状态',width:100, align:'center', formatter:function(val, row, index) {
+        	// 第一个参数当前这个单元格的值，第二个参数指向当前这一行，即如果你想取id，可以通过row.tno，第三个参数行索引
+        	if (val == 0) {
+        		return "<font color='red'>已下架</font>";
+        	} else {
+        		return "<font color='green'>正常</font>";
+        	}
+        }, editor:{type:"combobox", options:{required: true, valueField: "id", textField:"name", data:types_status_obj}}}  
+    ]],
+    toolbar: [{
+		iconCls: 'icon-add',
+		text: "添加",
+		handler: function(){
+			types_op = "add";
+			types_msg = "添加";
+			if (types_edit_index == undefined) {
+				types_obj.datagrid('insertRow',{index: 0, row: {}});
+				types_obj.datagrid('beginEdit', 0);
+				types_edit_index = 0; // 记录正在编辑第一行
+			}
+		}
+	},'-',{
+		iconCls: 'icon-edit',
+		text: "编辑",
+		handler: function(){
+			types_op = "update";
+			types_msg = "修改";
+			
+			if (types_edit_index != undefined) {
+				return;
+			}
+			
+			// 先获取选中的行
+			var row = types_obj.datagrid('getSelected');
+			if (row == null) {
+				$.messager.show({title:'温馨提示',	msg:'请选择您要修改的商品类型信息...', timeout:2000, showType:'slide'});
+				return;
+			}
+			
+			types_edit_index = types_obj.datagrid('getRowIndex', row);
+			
+			// 开启编辑
+			types_obj.datagrid("beginEdit", types_edit_index);
+		}
+	},'-',{
+		iconCls: 'icon-save',
+		text: "保存",
+		handler: function(){
+			// 查看有没有编辑的行
+			if (types_edit_index == undefined) { // 说明没有在编辑的信息
+				return;
+			}
+			
+			// 结束编辑
+			types_obj.datagrid('endEdit', types_edit_index);
+			
+			// 获取编辑的数据
+			var row = types_obj.datagrid('getChanges')[0];
+			 
+			row.op = types_op; // 往这个row对象中添加一个属性
+			
+			// 发送到数据库
+			$.post("../../type", row,  result => {
+				result = parseInt($.trim(result));
+				
+				if (result > 0) {
+					$.messager.show({title:'成功提示',	msg:'商品类型' + types_msg + '成功...', timeout:2000, showType:'slide'});
+					types_obj.datagrid('reload'); // 重新加载数据
+				} else {
+					types_obj.datagrid('rejectChanges');
+					$.messager.alert('失败提示','商品类型' + types_msg + '失败，请稍后重试...','error');
+				}
+				row = null;
+				types_edit_index = undefined;
+			}, "text");
+		}
+	},'-',{
+		iconCls: 'icon-undo',
+		text: "撤销",
+		handler: function(){
+			types_edit_index = undefined;
+			types_obj.datagrid('rejectChanges');
+		}
+	}]
+});  
+</script>

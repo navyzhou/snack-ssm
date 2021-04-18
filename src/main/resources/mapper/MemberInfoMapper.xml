@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 注意：namespace必须是这个映射文件对应的接口的类路径 -->
+<mapper namespace="com.yc.snacknet.mapper.IMemberInfoMapper">
+	<select id="login" parameterType="MemberInfo" resultType="MemberInfo">
+		select mno, nickName, realName, tel, email, photo from memberinfo where status != 0 
+		and (nickName=#{nickName} or tel=#{nickName} or email=#{nickName}) and pwd=md5(#{pwd})
+	</select>
+	
+	<insert id="reg" parameterType="MemberInfo">
+		insert into memberinfo values(0, #{nickName}, #{realName}, md5(#{pwd}), #{tel}, #{email}, #{photo}, now(), 1)
+	</insert>
+</mapper>

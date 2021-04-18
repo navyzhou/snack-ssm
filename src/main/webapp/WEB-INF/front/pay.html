@@ -1,0 +1,293 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>源辰-零食网支付</title>
+<base href="../">
+<meta name="keywords" content="小吃,美食,零食,源辰" />
+<meta name="description" content="各种小吃美食，应有尽有" />
+<link href="images/yc.png" rel="shortcut icon" type="image/x-icon" />
+<link href="css/header.css" rel="stylesheet" type="text/css" />
+<link href="css/pay.css" rel="stylesheet" type="text/css" />
+<link href="css/footer.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+<!-- 顶部区域 -->
+<header id="header">
+	<!-- 顶部标题区域 -->
+	<div class="htitle">
+    	<a href="#" target="_blank" class="location">衡阳</a>
+        
+        <div class="header-info" id="login_info">
+            <div class="login-info" v-if="onlogin">
+            	<a href="user.html" title="点击登录" target="_blank">欢迎您：{{nickName}}</a>
+                <a href="register.html" title="点击注册"> 免费注册 </a>
+            </div>
+            
+            <div class="login-info" v-else>
+            	<a href="login.html" title="点击登录">您好，请登录</a>
+                <a href="register.html" title="点击注册"> 免费注册 </a>
+            </div>
+            
+            <div class="person-info">
+            	<span>|</span>
+            	<a href="front/order.html" target="_blank">我的订单</a>
+                <span>|</span>
+                <a href="#" target="_blank">我的小吃</a>
+                <span>|</span>
+                <a href="#" target="_blank">客户服务</a>
+                <span>|</span>
+           		<a href="#" target="_blank">个人信息</a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 顶部搜索区域 -->
+    <div class="search">
+    	<div class="search_left">
+    		<a href="index.html" title="首页">
+            	<img src="images/logo.png" width="260px" height="120px"/> 
+            </a>
+        </div>
+        
+        <div class="search_right"  id="search_item">
+        	<div class="search_top">
+                <div class="search_div">
+                    <input type="search" class="search-ipt" placeholder="请输入要搜索的内容" />
+                    <input type="button" class="search-btn"/>  
+                </div>
+                <div class="buycart">
+                	<i class="iconfont">{{cartCount}}</i>
+                    <a href="front/cart.html" target="_blank">我的购物车</a>
+                </div>
+            </div>
+            
+            <div class="search_item">
+            	<a href="javascript:void(0)" data-tno="" class="selected" @click="findByTno(0, '')">全部</a>
+            	<a v-for="(type, index) in types" :data-tno="type.tno"  href="javascript:void(0)" @click="findByTno(index + 1, type.tno)">{{type.tname}}</a>
+            </div>
+        </div>
+    </div>
+</header>
+
+<div id="app">  
+	<!-- 收货地址 -->
+	<h3 class="common_title">确认收货地址</h3>
+	
+	<div class="common_list_con clearfix">
+	    <input type="hidden" id="default_addr"/>
+	    <input type="hidden" id="current_addr"/>
+	    <dl id="addr_list">
+	        <dt>寄送到：</dt>
+	        <dd v-for="addr in addrs" v-if="addr.flag == 1" class="current_location" :data-ano="addr.ano">
+	        	{{addr.province}}&nbsp;{{addr.city}}&nbsp;{{addr.area}}&nbsp;{{addr.addr}} &nbsp; （{{addr.name}} 收） &nbsp; {{addr.tel}} 
+	        </dd>
+	        <dd v-else :data-ano="addr.ano">
+	        	{{addr.province}}&nbsp;{{addr.city}}&nbsp;{{addr.area}}&nbsp;{{addr.addr}} &nbsp; （{{addr.name}} 收） &nbsp; {{addr.tel}} 
+	        </dd>
+		</dl>
+	    <a href="javascript:showAddrDiv()" class="edit_site">编辑收货地址</a>
+	</div>
+	
+	<!-- 支付方式 -->	
+	<h3 class="common_title">支付方式</h3>	
+	<div class="common_list_con clearfix">
+	    <div class="pay_style_con clearfix">
+	        <input type="radio" name="pay_style">
+	        <label class="cash">货到付款</label>
+	        <input type="radio" name="pay_style">
+	        <label class="weixin">微信支付</label>
+	        <input type="radio" name="pay_style" checked>
+	        <label class="zhifubao"></label>
+	        <input type="radio" name="pay_style">
+	        <label class="bank">银行卡支付</label>
+	    </div>
+	</div>
+	
+	<!-- 商品列表 -->
+	<h3 class="common_title">商品列表</h3>
+	<div class="common_list_con clearfix" id="order_list">
+	    <ul class="goods_list_th clearfix">
+	        <li class="col01">商品名称</li>
+	        <li class="col02">商品单位</li>
+	        <li class="col03">商品价格</li>
+	        <li class="col04">数量</li>
+	        <li class="col05">小计</li>		
+	    </ul>
+	    <ul class="goods_list_td clearfix" v-for="(item, index) in orders">
+	        <li class="col01">{{index + 1}}</li>			
+	        <li class="col02"><img :src="item.pics"></li>
+	        <li class="col03">{{item.gname}}</li>
+	        <li class="col04">{{item.weight}} / {{item.unit}}</li>
+	        <li class="col05">{{item.price}}元</li>
+	        <li class="col06">{{item.num}}</li>
+	        <li class="col07" v-html="(item.num * item.price).toFixed(2) + '元'"></li>	
+	    </ul>
+	</div>
+	 
+	<!-- 金额结算 -->	
+	<h3 class="common_title">总金额结算</h3>
+	<div class="common_list_con clearfix">
+	    <div class="settle_con">
+	        <div class="total_goods_count">共<em id="totalcount">{{totalCount}}</em>件商品，总金额: <b id="total_price">{{totalPrice}}元</b></div>
+	        <div class="transit">运费: <b>10元</b></div>
+	        <div class="total_pay">实付款: <b id="total_pay">{{totalPrice + 10}}元</b></div>
+	    </div>
+	</div>
+</div>
+<div class="order_submit clearfix">
+    <a href="javascript:void(0)" id="order_btn" onclick="payOrder()">提交订单</a>
+</div>	
+
+<div id="addr_div">
+    <img src="images/close.png" title="关闭" onclick="hiddenDiv()"/>
+    <form id="myform">
+        <ul>
+            <li>
+                <label for="addr_name">收货人：</label>
+                <input id="addr_name" name="name" type="text" placeholder="请输入收货人姓名..." />
+            </li>
+            <li>
+                <label for="addr_tel">联系方式：</label>
+                <input id="addr_tel" name="tel" type="text" placeholder="请输入收货人联系方式..." />
+            </li>
+            <li>
+                <label>收货地址：</label>
+                <select id="province" name="province"></select>
+                <select id="city" name="city">
+                    <option value="0">--请选择城市--</option>
+                </select>
+                <select id="area" name="area">
+                    <option value="0">--请选择地区--</option>
+                </select>
+            </li>
+            <li>
+                <label for="addr_addr">详细地址：</label>
+                <input id="addr_addr" name="addr" style='width: 480px;' type="text" placeholder="请输入详细地址（街道、门牌等）" />
+            </li>
+            <li class="addr_btn">
+                <a href="javascript:addAddr()" >添加收货地址</a>
+            </li>
+        </ul>
+    </form>
+</div>
+
+<div class="popup_con">
+	<div class="popup">
+		<p id="popup_info"></p>
+	</div>
+</div>  
+        
+<footer>
+	<div class="foot_link">
+        <a href="#">关于我们</a> <span> | </span>
+        <a href="#">联系我们</a> <span> | </span>
+        <a href="#">招聘广告</a> <span> | </span>
+        <a href="#">友情链接</a>
+    </div>
+    <p>CopyRight &copy; 2019 <a class="copy" href="http://www.hyycinfo.com" target="_blank">衡阳市源辰信息科技有限公司</a> All Rights Reserverd</p>
+    <p>电话：0734-8355998 湘ICP备16015987号-1</p>
+</footer>
+
+<script type="text/javascript" src="js/jquery-3.4.1.min.js"></script>
+<script type="text/javascript" src="js/vue.js"></script>
+<script type="text/javascript" src="js/axios.js"></script>
+<script type="text/javascript" src="js/qs.js"></script>
+<script type="text/javascript" src="js/checklogin.js"></script>
+<script type="text/javascript" src="js/getcartinfo.js"></script>
+<script type="text/javascript" src="js/addr.js"></script>
+
+<script type="text/javascript">
+let app = new Vue({
+	el:"#app",
+	data: {
+		orders: [],
+		totalPrice: 0,
+		totalCount: 0,
+		addrs: []
+	},
+	mounted: function() {
+		axios.all([getAddrInfo(), getGoodsInfo()]).then(axios.spread((rt1, rt2) => {
+			// rt1是第一个方法的返回值，rt2是第二个方法的返回值
+			if (rt1.status == 200 && rt1.data.code == 200) {
+				this.addrs = rt1.data.data;
+			}
+			
+			if (rt2.status == 200 && rt2.data.code == 200) {
+				this.orders = rt2.data.data;
+				
+				this.orders.forEach( (item, index) => {
+					this.totalCount += item.num;
+					this.totalPrice += item.num * item.price;
+				})
+				this.totalPrice = parseFloat(this.totalPrice.toFixed(2));
+			}
+			
+			this.$nextTick(function() {
+				bindInfo();
+			})
+		}))
+	}
+})
+
+// 获取收货地址信息
+function getAddrInfo() {
+	return axios.get("addr/findByMno");
+}
+
+// 根据用户选中的购物车编号，查询要下单购买的商品信息
+function getGoodsInfo() {
+	// 从本地存储里面获取要查询的购物车的编号
+	let cnos = localStorage.getItem("cnos");
+	
+	if (!cnos) { // 说明没有勾选商品信息，则调到购物车里面
+		showMsg("请先选择您要购买的商品...", function() {location.href="front/cart.html";})
+		return;
+	}
+	return axios.post("cart/findByCnos", qs.stringify({cnos:cnos}));
+}
+
+function showAddrDiv() {
+	$("#addr_div").css("display", "block");
+}
+
+function hiddenDiv() {
+	$("#addr_div").css("display", "none");
+}
+
+function bindInfo() {
+	$("#addr_list > dd").click(function() {
+		$("#addr_list > dd").removeClass("current_location");
+		$(this).addClass("current_location");
+	})
+}
+
+// 提交订单
+function payOrder() {
+	let cnos = localStorage.getItem("cnos");
+	
+	if (!cnos) { // 说明没有勾选商品信息，则调到购物车里面
+		showMsg("请先选择您要购买的商品...", function() {location.href="front/cart.html";})
+		return;
+	}
+	
+	
+	var totalPrice = $.trim($("#total_pay").text().replace("元","")); // 获取订单总价
+	var ano = $("#addr_list > dd[class='current_location']").data("ano");
+	
+	$.post("order/add", {cnos:cnos, totalPrice:totalPrice, ano:ano}, result => {
+		if (result.code == 200) {
+			localStorage.removeItem("cnos"); // 清除本地缓存中的购物车编号信息
+			// 只是最好是调用支付宝的沙箱模拟支付
+			showMsg("下单成功请支付...", function() {
+				location.href = 'order/alipay/pay/' + result.data + '/' + totalPrice;
+			})
+		} else {
+			showMsg("下单失败，请稍后重试...", null)
+		}
+	}, "json");
+}
+</script>
+</body>
+</html>

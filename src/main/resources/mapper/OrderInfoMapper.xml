@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 注意：namespace必须是这个映射文件对应的接口的类路径 -->
+<mapper namespace="com.yc.snacknet.mapper.IOrderInfoMapper">
+	<insert id="add" parameterType="map">
+		insert into orderinfo(ono, odate, ano, status, price) values(#{ono}, now(), #{ano}, 1, #{totalPrice})
+	</insert>
+	
+	<update id="update" parameterType="map">
+		update orderinfo set status = #{status} where ono = #{ono}
+	</update>
+	
+	<select id="finds" parameterType="int" resultMap="orderInfo">
+		select of.ono, date_format(odate, '%Y-%m-%d %H:%i') odate, of.price totalPrice, of.status,gf.gno, gname, pics, weight, unit, 
+		oif.nums, oif.price   from orderinfo of, orderiteminfo oif, goodsinfo gf where of.ono=oif.ono and oif.gno=gf.gno 
+		and ano in(select ano from addrinfo where mno=#{_parameter}) order by odate desc;
+	</select>
+	
+	<resultMap type="OrderInfoDTO" id="orderInfo" autoMapping="true">
+		<id column="ono" property="ono"></id>
+		
+		<collection property="goods" ofType="GoodsInfoDTO" autoMapping="true">
+			<id column="gno" property="gno" />
+		</collection>
+		
+	</resultMap>
+</mapper>

@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+        https://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+		https://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/aop
+		https://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/tx
+        https://www.springframework.org/schema/tx/spring-tx.xsd">
+
+	<!-- 配置扫描的基址路径 -->
+	<context:component-scan base-package="com.yc.snacknet">
+		<context:exclude-filter type="annotation" expression="org.springframework.web.bind.annotation.RequestMapping"/>
+		<context:exclude-filter type="annotation" expression="org.springframework.web.bind.annotation.RequestParam"/>
+		<context:exclude-filter type="annotation" expression="org.springframework.web.bind.annotation.RequestBody"/>
+		<context:exclude-filter type="annotation" expression="org.springframework.web.bind.annotation.GetMapping"/>
+		<context:exclude-filter type="annotation" expression="org.springframework.web.bind.annotation.PostMapping"/>
+		<context:exclude-filter type="annotation" expression="org.springframework.web.bind.annotation.ResponseBody"/>
+		<context:exclude-filter type="annotation" expression="org.springframework.web.bind.annotation.RestController"/>
+	</context:component-scan>
+
+	<!-- 导入资源文件 -->
+	<context:property-placeholder location="classpath:db.properties" />
+	
+	<!-- 配置数据源 -->
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+	    <property name="driverClassName" value="${driverClass}" />
+	    <property name="url" value="${url}" />
+	    <property name="username" value="${user}" />
+	    <property name="password" value="${password}" />
+	</bean>
+	
+	<!-- SqlSessionFactory -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<!-- 配置数据源 -->
+		<property name="dataSource" ref="dataSource"></property>
+		
+		<!-- mapper.xml文件目录 -->
+		<property name="mapperLocations" value="classpath:mapper/*Mapper.xml"></property>
+		
+		<!-- 别名 -->
+		<property name="typeAliasesPackage" value="com.yc.snacknet.bean"></property>
+	</bean>
+	
+	<!-- 配置mybatis映射接口的代理实现，bean的id值必须跟对应接口的方法一致 -->
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<!-- 指定mapper映射文件对应的接口所在的包路径 -->
+		<property name="basePackage" value="com.yc.snacknet.mapper"></property>
+		
+		<!-- 注意：这个地方需要用value而不是ref -->
+		<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"></property>
+	</bean>
+	
+	<!-- 事务配置 -->
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource"></property>	 
+	</bean>
+	
+	<!-- 启用事务注解 -->
+	<tx:annotation-driven transaction-manager="transactionManager"/>
+	
+	<!-- 配置文件上传的工具类 -->
+	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<property name="defaultEncoding" value="utf-8"></property>
+		<property name="maxUploadSize" value="10485760000"></property>
+		<property name="maxInMemorySize" value="40960"></property>
+	</bean>
+	
+	<!-- 邮件发送的工具类 -->
+	<bean id="sendEMailUtil" class="com.yc.snacknet.util.SendEmailUtil">
+		<property name="sendEmail" value="1293580602@qq.com"></property>
+		<property name="password" value="dihpepdwtahlgefh"></property>
+	</bean>
+</beans>

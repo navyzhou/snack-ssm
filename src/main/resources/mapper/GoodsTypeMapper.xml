@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 注意：namespace必须是这个映射文件对应的接口的类路径 -->
+<mapper namespace="com.yc.snacknet.mapper.IGoodsTypeMapper">
+	<insert id="add" parameterType="GoodsType">
+		insert into goodstype values(0, #{tname}, 1)
+	</insert>
+	
+	<update id="update" parameterType="GoodsType">
+		update goodstype set tname=#{tname}, status=#{status} where tno=#{tno}
+	</update>
+	
+	<select id="findAll" resultType="GoodsType">
+		select tno, tname from goodstype
+	</select>
+	
+	<select id="finds" resultType="GoodsType">
+		select tno, tname from goodstype where status != 0
+	</select>
+</mapper>
